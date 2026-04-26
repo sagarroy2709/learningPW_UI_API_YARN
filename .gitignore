@@ -25,6 +25,7 @@ node_modules
 
 #test data
 .env.*
+!.env.example
 
 #auth file
 .auth
