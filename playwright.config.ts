@@ -23,9 +23,9 @@ export default defineConfig({
     ['html', { open: 'never' }]
   ],
   workers: 5,
-  timeout: 30*1000,
+  timeout: 30 * 1000,
   expect: {
-    timeout: 30*1000,
+    timeout: 30 * 1000,
   },
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -33,8 +33,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    headless: false,
-    
+    headless: process.env.HEADLESS !== 'false',
   },
 
   /* Configure projects for major browsers */
@@ -53,7 +52,7 @@ export default defineConfig({
     //   name: 'webkit',
     //   use: { ...devices['Desktop Safari'] },
     // },
-  
+
   ],
 
 });
