@@ -28,33 +28,33 @@ const AUTH_DIR = path.resolve(process.cwd(), ".auth");
 // describe the same entity — the user
 export const USERS = {
     standardUser: {
-        username: required("Standard_User_USERNAME"),
-        password: required("Standard_User_PASSWORD"),
+        username: required("STANDARD_USER_USERNAME"),
+        password: required("STANDARD_USER_PASSWORD"),
         authFile: path.join(AUTH_DIR, "standard-user.json"),
     },
     lockedOutUser: {
-        username: required("Locked_Out_User_USERNAME"),
-        password: required("Locked_Out_User_PASSWORD"),
+        username: required("LOCKED_OUT_USER_USERNAME"),
+        password: required("LOCKED_OUT_USER_PASSWORD"),
         authFile: path.join(AUTH_DIR, "locked-out-user.json"),
     },
     problemUser: {
-        username: required("Problem_User_USERNAME"),
-        password: required("Problem_User_PASSWORD"),
+        username: required("PROBLEM_USER_USERNAME"),
+        password: required("PROBLEM_USER_PASSWORD"),
         authFile: path.join(AUTH_DIR, "problem-user.json"),
     },
     performanceGlitchUser: {
-        username: required("Performance_Glitch_User_USERNAME"),
-        password: required("Performance_Glitch_User_PASSWORD"),
+        username: required("PERFORMANCE_GLITCH_USER_USERNAME"),
+        password: required("PERFORMANCE_GLITCH_USER_PASSWORD"),
         authFile: path.join(AUTH_DIR, "performance-glitch-user.json"),
     },
     errorUser: {
-        username: required("Error_User_USERNAME"),
-        password: required("Error_User_PASSWORD"),
+        username: required("ERROR_USER_USERNAME"),
+        password: required("ERROR_USER_PASSWORD"),
         authFile: path.join(AUTH_DIR, "error-user.json"),
     },
     visualUser: {
-        username: required("Visual_User_USERNAME"),
-        password: required("Visual_User_PASSWORD"),
+        username: required("VISUAL_USER_USERNAME"),
+        password: required("VISUAL_USER_PASSWORD"),
         authFile: path.join(AUTH_DIR, "visual-user.json"),
     },
 } as const;
