@@ -1,33 +1,96 @@
+# ============================================================
+# FILE: .github/workflows/playwright.yml
+# ============================================================
+
 name: Playwright Tests
 
 on:
+  # ── Existing triggers (untouched) ───────────────────────────
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
+  # ── Manual trigger via GitHub UI ────────────────────────────
+  # Go to: Actions → Playwright Tests → Run workflow
+  workflow_dispatch:
+    inputs:
+
+      environment:
+        description: "Target environment"
+        required: true
+        default: "test"
+        type: choice
+        options:
+          - dev
+          - test
+
+      browser:
+        description: "Browser to run tests on"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
+          - all           # Runs every project defined in playwright.config.ts
+
+      suite:
+        description: "Test suite or tag to run (e.g. @smoke, @regression, or a filename)"
+        required: false
+        default: ""       # Empty = run all tests
+
+      workers:
+        description: "Number of parallel workers (1 = serial, leave blank = Playwright default)"
+        required: false
+        default: ""       # Empty = use whatever is set in playwright.config.ts
+
 jobs:
   test:
+    # ── Dynamic job name shows what was chosen ──────────────────
+    # Falls back to sensible labels when triggered via push/PR
+    name: >-
+      [${{ github.event.inputs.browser || 'all' }}]
+      env=${{ github.event.inputs.environment || 'test' }}
+      workers=${{ github.event.inputs.workers || 'default' }}
+      suite=${{ github.event.inputs.suite || 'all' }}
+
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
+      # ── 1. Checkout ──────────────────────────────────────────
       - uses: actions/checkout@v4
 
+      # ── 2. Corepack (preserves your Yarn version pinning) ────
       - name: Enable Corepack
         run: corepack enable
 
+      # ── 3. Node + Yarn cache ─────────────────────────────────
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'yarn'
 
+      # ── 4. Install dependencies ──────────────────────────────
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # ── 5. Install Playwright browsers ───────────────────────
+      #    Installs only the chosen browser when run manually;
+      #    installs all browsers on push/PR (no input = "all").
       - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps chromium
+        run: |
+          BROWSER="${{ github.event.inputs.browser }}"
+          if [ -z "$BROWSER" ] || [ "$BROWSER" = "all" ]; then
+            yarn playwright install --with-deps
+          else
+            yarn playwright install --with-deps $BROWSER
+          fi
 
+      # ── 6. Create .env.test from GitHub Secrets ──────────────
+      #    (Your original step — completely unchanged)
       - name: Create env file
         run: |
           cat > .env.test << EOF
@@ -46,13 +109,40 @@ jobs:
           VISUAL_USER_PASSWORD=${{ secrets.VISUAL_USER_PASSWORD }}
           EOF
 
+      # ── 7. Run Playwright tests ───────────────────────────────
+      #    Builds the command dynamically from inputs.
+      #    On push/PR all inputs are empty so it behaves exactly
+      #    as your original "yarn playwright test".
       - name: Run Playwright tests
-        run: yarn playwright test
+        run: |
+          CMD="yarn playwright test"
 
+          BROWSER="${{ github.event.inputs.browser }}"
+          WORKERS="${{ github.event.inputs.workers }}"
+          SUITE="${{ github.event.inputs.suite }}"
+
+          if [ "$BROWSER" != "all" ]; then
+            CMD="$CMD --project=$BROWSER"
+          fi
+
+          if [ -n "$WORKERS" ]; then
+            CMD="$CMD --workers=$WORKERS"
+          fi
+
+          if [ -n "$SUITE" ]; then
+            CMD="$CMD --grep=$SUITE"
+          fi
+
+          echo "Running: $CMD"
+          sh -c "$CMD"
+
+      # ── 8. Upload report ─────────────────────────────────────
+      #    Report name includes browser + environment so multiple
+      #    manual runs don't overwrite each other's reports.
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-${{ github.event.inputs.environment || 'test' }}-${{ github.event.inputs.browser || 'all' }}
           path: playwright-report/
           retention-days: 30
