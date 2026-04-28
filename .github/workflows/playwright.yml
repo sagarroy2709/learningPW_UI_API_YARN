@@ -46,6 +46,15 @@ on:
         required: false
         default: ""       # Empty = use whatever is set in playwright.config.ts
 
+      allure:
+        description: "Generate Allure report?"
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
 jobs:
   test:
     # ── Dynamic job name shows what was chosen ──────────────────
@@ -145,4 +154,29 @@ jobs:
         with:
           name: playwright-report-${{ github.event.inputs.environment || 'test' }}-${{ github.event.inputs.browser || 'all' }}
           path: playwright-report/
+          retention-days: 30
+      
+      # ── Upload Allure HTML report ─────────────────────────────
+      # Only uploaded when Allure was enabled for this run.
+      # Download from Actions → Summary → Artifacts → allure-report-*
+      # Open index.html locally in your browser to view.
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: ${{ github.event.inputs.allure == 'true' && !cancelled() }}
+        with:
+          name: allure-report-${{ github.event.inputs.environment || 'test' }}-${{ github.event.inputs.browser || 'all' }}
+          path: allure-report/
+          retention-days: 30
+
+      # ── Upload traces on failure ──────────────────────────────
+      # trace: 'retain-on-failure' in playwright.config.ts writes
+      # traces to test-results/ for any failing test.
+      # View: npx playwright show-trace trace.zip
+      #       or drag zip to https://trace.playwright.dev
+      - name: Upload traces
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: playwright-traces-${{ github.event.inputs.environment || 'test' }}-${{ github.event.inputs.browser || 'all' }}
+          path: test-results/
           retention-days: 30

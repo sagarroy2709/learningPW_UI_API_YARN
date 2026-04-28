@@ -10,6 +10,11 @@ export default defineConfig({
   fullyParallel: true,
   reporter: [
     ['html', { open: 'never' }]
+    //enable below and install allure-playwright to generate allure report
+    // ,
+    // ...(process.env.ALLURE === 'true'
+    //   ? [['allure-playwright', { outputFolder: 'allure-results', suiteTitle: false }] as const]
+    //   : []),
   ],
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS) : 1,
   timeout: 30 * 1000,
