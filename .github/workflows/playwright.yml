@@ -63,8 +63,9 @@ jobs:
       workers=${{ github.event.inputs.workers || 'default' }}
       suite=${{ github.event.inputs.suite || 'all' }}
 
-    timeout-minutes: 60
+    timeout-minutes: 60 
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'test' }} # Sets the deployment environment in GitHub UI
 
     steps:
       # ── 1. Checkout ──────────────────────────────────────────
@@ -96,33 +97,28 @@ jobs:
             yarn playwright install --with-deps $BROWSER
           fi
 
-      # ── 6. Create .env.test from GitHub Secrets ──────────────
-      #    (Your original step — completely unchanged)
-      - name: Create env file
-        run: |
-          cat > .env.test << EOF
-          BASE_URL=${{ secrets.BASE_URL }}
-          STANDARD_USER_USERNAME=${{ secrets.STANDARD_USER_USERNAME }}
-          STANDARD_USER_PASSWORD=${{ secrets.STANDARD_USER_PASSWORD }}
-          LOCKED_OUT_USER_USERNAME=${{ secrets.LOCKED_OUT_USER_USERNAME }}
-          LOCKED_OUT_USER_PASSWORD=${{ secrets.LOCKED_OUT_USER_PASSWORD }}
-          PROBLEM_USER_USERNAME=${{ secrets.PROBLEM_USER_USERNAME }}
-          PROBLEM_USER_PASSWORD=${{ secrets.PROBLEM_USER_PASSWORD }}
-          PERFORMANCE_GLITCH_USER_USERNAME=${{ secrets.PERFORMANCE_GLITCH_USER_USERNAME }}
-          PERFORMANCE_GLITCH_USER_PASSWORD=${{ secrets.PERFORMANCE_GLITCH_USER_PASSWORD }}
-          ERROR_USER_USERNAME=${{ secrets.ERROR_USER_USERNAME }}
-          ERROR_USER_PASSWORD=${{ secrets.ERROR_USER_PASSWORD }}
-          VISUAL_USER_USERNAME=${{ secrets.VISUAL_USER_USERNAME }}
-          VISUAL_USER_PASSWORD=${{ secrets.VISUAL_USER_PASSWORD }}
-          EOF
-
       # ── 7. Run Playwright tests ───────────────────────────────
       #    Builds the command dynamically from inputs.
       #    On push/PR all inputs are empty so it behaves exactly
       #    as your original "yarn playwright test".
       - name: Run Playwright tests
         env:
-          ENV: ${{ github.event.inputs.environment }}  # ← reads from dispatch input
+          ENV:                              ${{ github.event.inputs.environment || 'test' }}
+          # variables — use vars.*
+          BASE_URL:                         ${{ vars.BASE_URL }}
+          STANDARD_USER_USERNAME:           ${{ vars.STANDARD_USER_USERNAME }}
+          LOCKED_OUT_USER_USERNAME:         ${{ vars.LOCKED_OUT_USER_USERNAME }}
+          PROBLEM_USER_USERNAME:            ${{ vars.PROBLEM_USER_USERNAME }}
+          PERFORMANCE_GLITCH_USER_USERNAME: ${{ vars.PERFORMANCE_GLITCH_USER_USERNAME }}
+          ERROR_USER_USERNAME:              ${{ vars.ERROR_USER_USERNAME }}
+          VISUAL_USER_USERNAME:             ${{ vars.VISUAL_USER_USERNAME }}
+          # secrets — use secrets.*
+          STANDARD_USER_PASSWORD:           ${{ secrets.STANDARD_USER_PASSWORD }}
+          LOCKED_OUT_USER_PASSWORD:         ${{ secrets.LOCKED_OUT_USER_PASSWORD }}
+          PROBLEM_USER_PASSWORD:            ${{ secrets.PROBLEM_USER_PASSWORD }}
+          PERFORMANCE_GLITCH_USER_PASSWORD: ${{ secrets.PERFORMANCE_GLITCH_USER_PASSWORD }}
+          ERROR_USER_PASSWORD:              ${{ secrets.ERROR_USER_PASSWORD }}
+          VISUAL_USER_PASSWORD:             ${{ secrets.VISUAL_USER_PASSWORD }}
         run: |
           CMD="yarn playwright test"
 
