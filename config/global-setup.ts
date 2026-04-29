@@ -1,9 +1,9 @@
-// tests/global-setup.ts
 import { chromium, firefox, webkit, FullConfig, BrowserType } from "@playwright/test";
-import { ENV } from "./env.config";
 import * as fs from "fs";
 import * as path from "path";
+import { ENV } from "./env.config";  // ← env.config handles dotenv internally
 import { LoginPage } from "../pages/LoginPage.PO";
+
 
 async function globalSetup(config: FullConfig) {
 
@@ -23,10 +23,11 @@ async function loginAndSave(
   credentials: { username: string; password: string, authFile: string }, browserType: BrowserType): Promise<void> {
   const browser = await browserType.launch();
   try {
-    const context = await browser.newContext();
+    const context = await browser.newContext({ 
+      baseURL: ENV.BASE_URL });
     const page = await context.newPage();
     const loginPage = new LoginPage(page);
-    await loginPage.goto(ENV.BASE_URL);
+    await loginPage.goto( );
     await loginPage.loginAs(credentials.username,credentials.password);
     await context.storageState({ path: credentials.authFile });
     console.log(`✓ Auth saved: ${credentials.authFile}`);

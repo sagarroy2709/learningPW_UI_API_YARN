@@ -3,8 +3,9 @@ import * as path from "path";
 
 // Load .env from project root — does nothing if file doesn't exist (e.g. CI)
 // CI injects variables directly into process.env, no file needed
-const env = process.env.NODE_ENV ?? "test";
+const env = process.env.ENV ?? "test";
 dotenv.config({ path: path.resolve(process.cwd(), `.env.${env}`) });
+console.log(`injected env (${env}) from .env.${env}`);
 
 // Validates a variable exists at startup — fails loudly rather than
 // silently passing undefined into test code
@@ -66,5 +67,5 @@ export type User = Users[UserKey];
 
 export const ENV = {
     BASE_URL: required("BASE_URL"),
-    USERS,
+    USERS, // NEED TO OPTIMISE THE REQUIRED FUNCTION CALLING FOR EACH USER
 } as const;

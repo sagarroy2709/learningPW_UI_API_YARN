@@ -1,23 +1,20 @@
 import { Page, Locator, expect } from "@playwright/test"
+import { BasePage } from "./BasePage";
 
-export class LoginPage {
+export class LoginPage extends BasePage {
 
-    private readonly page: Page;
+    protected readonly path = '/';
     private readonly usernameInput: Locator;
     private readonly passwordInput: Locator;
     private readonly signInButton: Locator;
     private readonly lockedOutLabel: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.usernameInput = page.getByRole('textbox', { name: 'Username' });
         this.passwordInput = page.getByRole('textbox', { name: 'Password' });
         this.signInButton = page.locator('[data-test="login-button"]');
         this.lockedOutLabel = page.getByRole('heading', { name: /Epic sadface: Sorry, this user has been locked out\./i });
-    }
-
-    async goto(baseURL: string) {
-        await this.page.goto(baseURL);
     }
 
     private async fillUsername(username: string) {
@@ -38,7 +35,7 @@ export class LoginPage {
         await this.submit();
     }
 
-    async verifyLockedoutMessageForLockedOutUser(){
+    async verifyLockedoutMessageForLockedOutUser() {
         await expect(this.lockedOutLabel).toBeVisible();
     }
 

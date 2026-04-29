@@ -1,20 +1,19 @@
 import {Page, Locator} from "@playwright/test"
 import {expect} from "../fixtures/index.fixture"
 import { ENV } from "../config/env.config";
+import { BasePage } from "./BasePage";
 
-export class InventoryPage{
+export class InventoryPage extends BasePage {
 
-    private readonly page: Page;
-
+    protected readonly path = '/inventory.html';
+    
     constructor(page:Page){
-        this.page = page;
+        super(page);
     }
 
-    async goto() {
-        await this.page.goto(ENV.BASE_URL + '/inventory.html');
-    }
     async assertInventoryPageLoaded(){
-        await expect(this.page).toHaveURL(/.*inventory/);
+        await expect(this.page).toHaveURL(/.*inventory/); //Passes
+        // await expect(this.page).not.toHaveURL(/.*inventory/); //Fails
     }
 
 }

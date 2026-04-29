@@ -5,9 +5,8 @@
 name: Playwright Tests
 
 on:
-  # ── Existing triggers (untouched) ───────────────────────────
-  push:
-    branches: [ main, master ]
+  # push:
+  #   branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
@@ -28,7 +27,7 @@ on:
       browser:
         description: "Browser to run tests on"
         required: true
-        default: "all"
+        default: "chromium"
         type: choice
         options:
           - chromium
@@ -44,7 +43,7 @@ on:
       workers:
         description: "Number of parallel workers (1 = serial, leave blank = Playwright default)"
         required: false
-        default: ""       # Empty = use whatever is set in playwright.config.ts
+        default: '1'       # Empty = use whatever is set in playwright.config.ts
 
       allure:
         description: "Generate Allure report?"

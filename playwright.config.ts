@@ -1,6 +1,7 @@
-/// <reference types="node" />
 import { defineConfig, devices } from '@playwright/test';
-import path from "path";
+import './config/env.config';  // ← triggers env.config.ts to run
+                               //   dotenv loads the correct .env file
+                               //   process.env.BASE_URL is now populated
 
 export default defineConfig({
   //below line logs into the application and create the storageState json for different users
@@ -16,31 +17,21 @@ export default defineConfig({
     //   ? [['allure-playwright', { outputFolder: 'allure-results', suiteTitle: false }] as const]
     //   : []),
   ],
-  workers: process.env.WORKERS ? parseInt(process.env.WORKERS) : 1,
   timeout: 30 * 1000,
   expect: {
     timeout: 30 * 1000,
   },
   use: {
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    baseURL: process.env.BASE_URL,
     trace: 'on-first-retry',
     headless: process.env.HEADED !== 'true',
   },
 
-  /* Configure projects for major browsers */
+  // all projects always defined — --project flag filters at run time through --projects CLI flag
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
   ],
 
 });

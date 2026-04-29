@@ -2,13 +2,13 @@
   "name": "learn-playwright-saucedemo-yarn",
   "packageManager": "yarn@4.14.1",
   "scripts": {
-    "test": "playwright test",
-    "test:chromium": "cross-env BROWSER=chromium playwright test",
-    "test:firefox": "cross-env BROWSER=firefox playwright test",
-    "test:webkit": "cross-env BROWSER=webkit playwright test",
-    "test:all": "cross-env BROWSER= playwright test",
-    "test:headed": "cross-env HEADLESS=true playwright test",
-    "test:ci": "cross-env CI=true playwright test"
+    "test": "yarn playwright test",
+    "test:chromium": "yarn playwright test --project=chromium",
+    "test:headedWithChromium": "cross-env HEADED=true yarn playwright test --project=chromium",
+    "test:firefox": "yarn playwright test --project=firefox",
+    "test:webkit": "yarn playwright test --project=webkit",
+    "test:all": "yarn playwright test --project=chromium --project=firefox --project=webkit",
+    "test:ci": "cross-env CI=true yarn playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
