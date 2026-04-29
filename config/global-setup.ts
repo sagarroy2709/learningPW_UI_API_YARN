@@ -7,7 +7,8 @@ import { LoginPage } from "../pages/LoginPage.PO";
 
 async function globalSetup(config: FullConfig) {
 
-  const browserName = config.projects[0]?.use?.browserName ?? "chromium";
+// use the browser from the active project — not hardcoded to projects[0]
+  const browserName = (config.projects.find(p => p.use?.browserName)?.use?.browserName) ?? 'chromium';
   const browserType = { chromium, firefox, webkit }[browserName] ?? chromium;
 
   // Create .auth/ dir once before all parallel logins
