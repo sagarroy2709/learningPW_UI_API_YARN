@@ -121,7 +121,7 @@ jobs:
           WORKERS="${{ github.event.inputs.workers }}"
           SUITE="${{ github.event.inputs.suite }}"
 
-           if [ "$BROWSER" = "all" ]; then
+          if [ "$BROWSER" = "all" ]; then
             CMD="$CMD --project=chromium --project=firefox --project=webkit"
           elif [ -n "$BROWSER" ]; then
             CMD="$CMD --project=$BROWSER"
