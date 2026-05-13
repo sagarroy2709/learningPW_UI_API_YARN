@@ -57,12 +57,7 @@ jobs:
   test:
     # ── Dynamic job name shows what was chosen ──────────────────
     # Falls back to sensible labels when triggered via push/PR
-    name: >-
-      [${{ github.event.inputs.browser || 'all' }}]
-      env=${{ github.event.inputs.environment || 'test' }}
-      workers=${{ github.event.inputs.workers || 'default' }}
-      suite=${{ github.event.inputs.suite || 'all' }}
-
+    name: "${{ github.event.inputs.environment || 'test' }} | ${{ github.event.inputs.browser || 'all' }} | workers=${{ github.event.inputs.workers || 'default' }} | suite=${{ github.event.inputs.suite || 'all' }}"
     timeout-minutes: 60 
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'test' }} # Sets the deployment environment in GitHub UI
